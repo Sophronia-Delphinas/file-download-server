@@ -1,5 +1,6 @@
 package indi.sophronia.server.file.util.data;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +9,7 @@ import java.util.*;
 public class UriQuery {
     private final Map<String, List<String>> queries = new HashMap<>();
 
-    public UriQuery(URI uri) {
+    public UriQuery(URI uri) throws UnsupportedEncodingException {
         String raw = uri.getRawQuery();
         if (raw == null) {
             return;
@@ -20,8 +21,8 @@ public class UriQuery {
             String[] kv = pair.split("=");
             String key = kv[0];
             String value = kv[1];
-            addPair(URLDecoder.decode(key, StandardCharsets.UTF_8),
-                    URLDecoder.decode(value, StandardCharsets.UTF_8));
+            addPair(URLDecoder.decode(key, StandardCharsets.UTF_8.name()),
+                    URLDecoder.decode(value, StandardCharsets.UTF_8.name()));
         }
     }
 

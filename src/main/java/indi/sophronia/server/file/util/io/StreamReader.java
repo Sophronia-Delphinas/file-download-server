@@ -57,7 +57,7 @@ public class StreamReader {
         if (!eof) {
             tail.removeTail(ls.stringValue().length());
         }
-        return Chunk.toString(head, charset);
+        return Chunk.toString(head, charset, eof);
     }
 
     private static boolean lineEnd(Chunk chunk, LineSeparator ls) {

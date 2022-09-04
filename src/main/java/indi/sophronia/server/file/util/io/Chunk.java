@@ -94,7 +94,7 @@ public class Chunk {
      */
     public int atReverseIndex(int index) {
         if (index < length) {
-            return bytes[index];
+            return bytes[length - 1 - index];
         }
         if (prev == null) {
             return -1;
@@ -150,8 +150,12 @@ public class Chunk {
     }
 
     public static String toString(Chunk head, Charset charset) {
+        return toString(head, charset, true);
+    }
+
+    public static String toString(Chunk head, Charset charset, boolean nullIfEmpty) {
         if (head.next == null && head.length == 0) {
-            return null;
+            return nullIfEmpty ? null : "";
         }
 
         byte[] bytes = new byte[totalLength(head)];
