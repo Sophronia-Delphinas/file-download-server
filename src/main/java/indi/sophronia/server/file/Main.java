@@ -10,6 +10,7 @@ import java.net.InetSocketAddress;
 
 public class Main {
     public static void main(String[] args) throws IOException {
+        System.out.println(PropertyHandler.userInfoQuery());
         HttpServer httpServer = HttpServer.
                 create(new InetSocketAddress(PropertyHandler.getPort()), 0);
         httpServer.createContext("/file", new DownloadHandler());

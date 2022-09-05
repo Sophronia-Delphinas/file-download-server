@@ -1,4 +1,4 @@
-package indi.sophronia.server.file.util.data;
+package indi.sophronia.server.file.util.net;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;

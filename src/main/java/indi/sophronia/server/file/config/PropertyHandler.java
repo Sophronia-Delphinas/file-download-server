@@ -38,4 +38,40 @@ public class PropertyHandler {
     public static String getBasePath() {
         return basePath.get();
     }
+
+    private static final Lazy<String> accessKeyId =
+            new Lazy<>(() -> {
+                String v = PROPERTIES.getProperty("access.key.id");
+                if (v == null || v.length() == 0) {
+                    throw new IllegalStateException("Access key is not specified");
+                }
+                return v;
+            });
+    public static String getAccessKeyId() {
+        return accessKeyId.get();
+    }
+
+    private static final Lazy<String> accessKeySecret =
+            new Lazy<>(() -> {
+                String v = PROPERTIES.getProperty("access.key.secret");
+                if (v == null || v.length() == 0) {
+                    throw new IllegalStateException("Access key is not specified");
+                }
+                return v;
+            });
+    public static String getAccessKeySecret() {
+        return accessKeySecret.get();
+    }
+
+    public static String username() {
+        return String.format("%08X", getAccessKeyId().hashCode());
+    }
+
+    public static String password() {
+        return String.format("%08X", getAccessKeySecret().hashCode());
+    }
+
+    public static String userInfoQuery() {
+        return "u=" + username() + "&p=" + password();
+    }
 }

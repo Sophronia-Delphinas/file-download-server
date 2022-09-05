@@ -3,7 +3,8 @@ package indi.sophronia.server.file.controller;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import indi.sophronia.server.file.config.PropertyHandler;
-import indi.sophronia.server.file.util.data.UriQuery;
+import indi.sophronia.server.file.util.net.NetContext;
+import indi.sophronia.server.file.util.net.UriQuery;
 import indi.sophronia.server.file.util.io.ChunkOutputBuffer;
 import indi.sophronia.server.file.util.io.StreamReader;
 
@@ -12,7 +13,7 @@ import java.io.*;
 public class DownloadHandler extends DefaultHttpHandler {
     @Override
     public ChunkOutputBuffer responseBuffer(HttpExchange exchange) throws IOException {
-        UriQuery query = new UriQuery(exchange.getRequestURI());
+        UriQuery query = NetContext.getQuery();
         String path = query.getFirstValue("path");
 
         if (path == null) {
