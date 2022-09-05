@@ -1,5 +1,7 @@
 package indi.sophronia.server.file.util.net;
 
+import indi.sophronia.server.file.util.io.ChunkOutputBuffer;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -41,5 +43,26 @@ public class UriQuery {
     public String getFirstValue(String key) {
         List<String> values = getValues(key);
         return values.isEmpty() ? null : values.get(0);
+    }
+
+    @Override
+    public String toString() {
+        ChunkOutputBuffer chunkOutputBuffer = new ChunkOutputBuffer();
+        queries.forEach((k, vs) -> {
+            chunkOutputBuffer.write(k.getBytes(StandardCharsets.UTF_8));
+            chunkOutputBuffer.write('=');
+            chunkOutputBuffer.write('[');
+            Iterator<String> iterator = vs.iterator();
+            while (iterator.hasNext()) {
+                String v = iterator.next();
+                chunkOutputBuffer.write(v.getBytes(StandardCharsets.UTF_8));
+                if (iterator.hasNext()) {
+                    chunkOutputBuffer.write(',');
+                }
+            }
+            chunkOutputBuffer.write(']');
+            chunkOutputBuffer.write('\n');
+        });
+        return chunkOutputBuffer.outputToString(StandardCharsets.UTF_8);
     }
 }

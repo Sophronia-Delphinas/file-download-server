@@ -2,6 +2,7 @@ package indi.sophronia.server.file.util.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 /**
  * Output stream based on byte chunks
@@ -45,5 +46,9 @@ public class ChunkOutputBuffer extends OutputStream {
 
     public int totalLength() {
         return Chunk.totalLength(head);
+    }
+
+    public String outputToString(Charset charset) {
+        return Chunk.toString(head, charset);
     }
 }
