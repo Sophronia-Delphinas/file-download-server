@@ -1,6 +1,8 @@
 package indi.sophronia.server.file.controller;
 
-import com.sun.net.httpserver.*;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import indi.sophronia.server.file.config.PropertyHandler;
 import indi.sophronia.server.file.util.io.ChunkOutputBuffer;
 import indi.sophronia.server.file.util.net.NetContext;
@@ -11,6 +13,15 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 public abstract class DefaultHttpHandler implements HttpHandler {
+    private final Runnable callback;
+
+    protected DefaultHttpHandler() {
+        this.callback = () -> {};
+    }
+    protected DefaultHttpHandler(Runnable callback) {
+        this.callback = callback;
+    }
+
     protected boolean authenticate() {
         UriQuery uriQuery = NetContext.getQuery();
         String u = uriQuery.getFirstValue("u");
@@ -20,16 +31,17 @@ public abstract class DefaultHttpHandler implements HttpHandler {
         return username.equals(u) && password.equals(p);
     }
 
-    protected abstract ChunkOutputBuffer responseBuffer(HttpExchange exchange) throws IOException;
+    protected abstract ChunkOutputBuffer response(HttpExchange exchange) throws IOException;
 
     @Override
     public final void handle(HttpExchange exchange) throws IOException {
         NetContext.setExchange(exchange);
 
-        if (authenticate()) {
+        boolean authenticated = authenticate();
+        if (authenticated) {
             ChunkOutputBuffer buffer;
             try {
-                buffer = responseBuffer(exchange);
+                buffer = response(exchange);
             } catch (Exception e) {
                 buffer = new ChunkOutputBuffer();
                 e.printStackTrace(new PrintWriter(buffer, true));
@@ -46,6 +58,8 @@ public abstract class DefaultHttpHandler implements HttpHandler {
         }
         exchange.getResponseBody().close();
 
-        NetContext.clear();
+        if (authenticated) {
+            callback.run();
+        }
     }
 }

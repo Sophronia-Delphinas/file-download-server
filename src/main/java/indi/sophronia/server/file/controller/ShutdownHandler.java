@@ -2,29 +2,22 @@ package indi.sophronia.server.file.controller;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
 import indi.sophronia.server.file.util.io.ChunkOutputBuffer;
+import indi.sophronia.server.file.util.io.StreamReader;
 import indi.sophronia.server.file.util.net.NetContext;
-import indi.sophronia.server.file.util.net.UriQuery;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 
 public class ShutdownHandler extends DefaultHttpHandler {
-    private final HttpServer httpServer;
-    private final Consumer<HttpServer> callback;
-
-    public ShutdownHandler(HttpServer httpServer, Consumer<HttpServer> callback) {
-        this.httpServer = httpServer;
-        this.callback = callback;
+    public ShutdownHandler(Runnable callback) {
+        super(callback);
     }
 
     @Override
-    protected ChunkOutputBuffer responseBuffer(HttpExchange exchange) {
-        UriQuery uriQuery = NetContext.getQuery();
-        System.out.println(uriQuery);
-
-        callback.accept(httpServer);
+    protected ChunkOutputBuffer response(HttpExchange exchange) throws IOException {
+        NetContext.setExitMessage(StreamReader.
+                readAll(exchange.getRequestBody(), StandardCharsets.UTF_8));
         Headers headers = exchange.getResponseHeaders();
         headers.add("Content-Type", "text/plain; charset=utf8");
         ChunkOutputBuffer buffer = new ChunkOutputBuffer();
