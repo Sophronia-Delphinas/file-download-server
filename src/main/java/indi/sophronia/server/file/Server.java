@@ -8,6 +8,9 @@ import indi.sophronia.server.file.util.net.NetContext;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Server {
     public static void start() throws IOException {
@@ -22,13 +25,20 @@ public class Server {
         httpServer.createContext("/file", new DownloadHandler());
         httpServer.createContext("/shutdown", new ShutdownHandler(
                 () -> {
-                    httpServer.removeContext("/file");
-                    httpServer.removeContext("/shutdown");
                     httpServer.stop(0);
                     onExit.run();
 
                     NetContext.clear();
                 }));
         httpServer.start();
+
+        int timeout = PropertyHandler.getTimeout();
+        if (timeout > 0) {
+            ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+            scheduledExecutorService.scheduleWithFixedDelay(() -> {
+                httpServer.stop(0);
+                scheduledExecutorService.shutdown();
+            }, timeout, timeout, TimeUnit.SECONDS);
+        }
     }
 }

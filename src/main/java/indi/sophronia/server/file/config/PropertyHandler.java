@@ -42,7 +42,7 @@ public class PropertyHandler {
     }
 
     private static final Lazy<Integer> PORT =
-            new Lazy<>(() -> Integer.parseInt(PROPERTIES.getProperty("server.port")));
+            new Lazy<>(() -> Integer.parseInt(getRequiredProperty("server.port")));
     public static int getPort() {
         return PORT.get();
     }
@@ -107,6 +107,17 @@ public class PropertyHandler {
 
     public static String getCurrentPath() {
         return CURRENT_PATH.get();
+    }
+
+    private static final Lazy<Integer> TIMEOUT = new Lazy<>(() -> {
+        String value = PROPERTIES.getProperty("server.timeout");
+        if (value == null || value.isEmpty()) {
+            return -1;
+        }
+        return Integer.parseInt(value);
+    });
+    public static int getTimeout() {
+        return TIMEOUT.get();
     }
 
     public static void setProperty(String key, String value) {
